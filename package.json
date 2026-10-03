@@ -1,0 +1,43 @@
+{
+  "name": "virapanel",
+  "private": true,
+  "version": "1.0.0",
+  "description": "ViraPanel — production-grade subscription & configuration management platform",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @vira/shared && npm run build -w @vira/db && npm run build -w @vira/core && npm run build -w @vira/worker && npm run build -w @vira/api && npm run build -w @vira/web",
+    "build:packages": "npm run build -w @vira/shared && npm run build -w @vira/db && npm run build -w @vira/core",
+    "typecheck": "npm run typecheck -w @vira/shared && npm run typecheck -w @vira/db && npm run typecheck -w @vira/core && npm run typecheck -w @vira/worker && npm run typecheck -w @vira/api && npm run typecheck -w @vira/web",
+    "dev": "npm run build:packages && node scripts/dev.mjs",
+    "dev:api": "npm run dev -w @vira/api",
+    "dev:web": "npm run dev -w @vira/web",
+    "dev:worker": "npm run dev -w @vira/worker",
+    "start": "node apps/api/dist/main.js",
+    "worker": "node apps/worker/dist/main.js",
+    "test": "vitest run",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "eslint .",
+    "db:migrate": "node scripts/migrate.mjs",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:reset": "node scripts/migrate.mjs --reset && tsx scripts/seed.ts",
+    "dev:agent": "node scripts/dev-node-agent.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "concurrently": "^8.2.2",
+    "drizzle-orm": "^0.45.3",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.71.0",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "type": "module"
+}

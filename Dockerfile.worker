@@ -1,0 +1,19 @@
+FROM node:20-bookworm-slim AS build
+WORKDIR /app
+COPY package.json package-lock.json* tsconfig.base.json ./
+COPY packages ./packages
+COPY apps ./apps
+RUN npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+RUN npm run build:packages && npm run build -w @vira/worker
+
+FROM node:20-bookworm-slim AS runtime
+ENV NODE_ENV=production
+WORKDIR /app
+RUN addgroup --system vira && adduser --system --ingroup vira vira
+COPY --from=build /app/package.json ./
+COPY --from=build /app/packages ./packages
+COPY --from=build /app/apps/worker/dist ./apps/worker/dist
+COPY --from=build /app/apps/worker/package.json ./apps/worker/
+COPY --from=build /app/node_modules ./node_modules
+USER vira
+CMD ["node", "apps/worker/dist/main.js"]

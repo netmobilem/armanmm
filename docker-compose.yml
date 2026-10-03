@@ -1,0 +1,24 @@
+# ViraPanel — single service, SQLite database on a mounted volume.
+# The worker is embedded in the API process by default (EMBED_WORKER != "false").
+# Redis is optional; set REDIS_URL only if you run it separately.
+services:
+  api:
+    build: .
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      DATABASE_PATH: /app/data/vira.db
+      SESSION_SECRET: local-dev-secret-change-me
+      ENCRYPTION_KEY: local-dev-encryption-key
+      PUBLIC_URL: http://localhost:8080
+      CORS_ORIGIN: http://localhost:8080
+      # First-boot owner account (bootstrap is idempotent; you can unset these afterwards)
+      OWNER_USERNAME: owner
+      OWNER_PASSWORD: Owner@12345
+    ports: ["8080:8080"]
+    volumes:
+      - viradata:/app/data
+    command: ["sh", "-c", "node scripts/migrate.mjs && node scripts/bootstrap.mjs && node apps/api/dist/main.js"]
+
+volumes:
+  viradata:

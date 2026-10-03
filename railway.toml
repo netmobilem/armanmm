@@ -1,0 +1,13 @@
+# Railway deployment topology (volume-backed storage):
+#   ONE service → this file (builds Dockerfile, runs migrate + bootstrap + api)
+#   ONE volume  → mounted at /app/data (SQLite database file lives here)
+#   Redis/Postgres plugins are NOT required.
+[build]
+builder = "DOCKER"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "node scripts/migrate.mjs && node scripts/bootstrap.mjs && node apps/api/dist/main.js"
+healthcheckPath = "/api/v1/health"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
